@@ -37,7 +37,10 @@ namespace USP_HOTEL_V2
 
         private void InsertData()
         {
-            string mySelect = "SELECT * FROM ROOMS WHERE ROOM_STATUS = 1";
+            string mySelect = "SELECT ROOMS.ID, ROOM_TYPES.ROOM_TYPE, ROOM_STATUSES.ROOM_STATUS FROM(( ROOMS " +
+                "INNER JOIN ROOM_TYPES ON ROOMS.ROOM_TYPE = ROOM_TYPES.ID) " +
+                "INNER JOIN ROOM_STATUSES ON ROOMS.ROOM_STATUS = ROOM_STATUSES.ID)" +
+                "ORDER BY ROOM_STATUSES.ROOM_STATUS DESC";
 
             dbConnect.ConnectionString = ConnectionString;
             dbConnect.Open();
