@@ -141,5 +141,51 @@ namespace USP_HOTEL_V2
 
             dbConnect.Close();
         }
+
+        private void UpdateRoomStatuses_Click(object sender, EventArgs e)
+        {
+            dbConnect.ConnectionString = ConnectionString;
+            dbConnect.Open();
+
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                string strRoomID = row.Cells[0].Value.ToString();
+
+                string mySelect = "SELECT ROOM_ID, FROM_DATE, TO_DATE FROM RESERVATIONS"
+                + " WHERE ROOM_ID = " + strRoomID
+                + " ORDER BY TO_DATE DESC";
+
+
+                OleDbDataAdapter adapter = new OleDbDataAdapter(mySelect, dbConnect);
+
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+
+                foreach (DataRow newrow in dt.Rows)
+                {
+                    DateTime reservationDate = Convert.ToDateTime(newrow[2].ToString());
+
+                    // Резервацията е изтекла и стаята е за освобождаване
+                    if(DateTime.Compare(DateTime.Now.Date, reservationDate) > 0)
+                    {
+                        string myUpdate = "UPDATE ROOMS SET ROOM_STATUS = 0 WHERE ID = " + strRoomID;
+
+                        OleDbCommand dbCommand = new OleDbCommand(myUpdate, dbConnect);
+
+                        dbCommand.CommandText = myUpdate;
+                        dbCommand.Connection = dbConnect;
+                        dbCommand.ExecuteNonQuery();
+                    }
+                    
+                    break;
+                }
+            }
+
+            dbConnect.Close();
+            InsertData();
+
+            MessageBox.Show("Успешно обновяване на статусите.", "Успех",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
